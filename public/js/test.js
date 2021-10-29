@@ -43,31 +43,80 @@ function onDataLoaded() {
     
     console.log("Complete!");
 
-    getWeeklyReport();
+    var dataset = getWeeklyReport();
+    buildChart(dataset);
 }
 
 function getWeeklyReport() {
-    var days = [{Day:"Sunday", KW:0},
-                {Day:"Monday", KW:0},
-                {Day:"Tuesday", KW:0},
-                {Day:"Wednesday", KW:0},
-                {Day:"Thursday", KW:0},
-                {Day:"Friday", KW:0},
-                {Day:"Saturday", KW:0}];
+    var days = [{x:"Sunday", y:0, z:0},
+                {x:"Monday", y:0, z:0},
+                {x:"Tuesday", y:0, z:0},
+                {x:"Wednesday", y:0, z:0},
+                {x:"Thursday", y:0, z:0},
+                {x:"Friday", y:0, z:0},
+                {x:"Saturday", y:0, z:0}];
 
     for(var i = 0; i < minutes.length; i++) {
         var day = minutes[i].Date.getDay();
         var kw = minutes[i].KW;
 
-        if(kw < 0) {
-            console.log(minutes[i]);
-        }
+        days[day].y += kw;
+        days[day].z++;
+    }       
+    
+    for(var j = 0; j < days.length; j++) {
+        days[j].y = (days[j].y / days[j].z)*1440;
+    } 
 
-        days[day].KW += kw;
-    }            
-    console.log(days);
+    return days;
 }
 
-function buildChart(){
+function buildChart(set){
+    //console.log(dataset);
     var ctx = document.getElementById('myChart');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            datasets: [{
+                label: 'KW',
+                data: set
+            }]
+        }
+    });
+    /*
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    */
 }
