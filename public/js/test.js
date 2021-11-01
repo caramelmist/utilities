@@ -17,19 +17,24 @@ function daysInMonth(year, month) {
 }
 
 window.onload = function() {
-    var checkList = document.getElementById('list1');
-    checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
-    if (checkList.classList.contains('visible'))
-        checkList.classList.remove('visible');
-    else
-        checkList.classList.add('visible');
-    };
+    initializeList('list1');
+    initializeList('list2');
 
     console.log('Loading data...');
     d3.csv("data/data.csv", function(data) {
         rawData.push({Date:new Date(data.Date), KW:Number(data.KW)});
     }).then( function() { onDataLoaded();} );
 };
+
+function initializeList(id) {
+    var checkList = document.getElementById(id);
+    checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
+    if (checkList.classList.contains('visible'))
+        checkList.classList.remove('visible');
+    else
+        checkList.classList.add('visible');
+    };
+}
 
 function onButtonClick() {
     var average = document.getElementById("average").checked;
@@ -93,7 +98,7 @@ function filterMinutes() {
         var day = allMinutes[i].Date.getDay();
         var hour = allMinutes[i].Date.getHours();
 
-        if(isDayFiltered(day)) {
+        if(isYearFiltered(year) || isDayFiltered(day)) {
             continue;
         }
         
@@ -109,6 +114,13 @@ function isDayFiltered(day) {
            (day == 4 && document.getElementById('chkThursday').checked == false) ||
            (day == 5 && document.getElementById('chkFriday').checked == false) ||
            (day == 6 && document.getElementById('chkSaturday').checked == false);
+}
+
+function isYearFiltered(year) {
+    return (year == 2019 && document.getElementById('chk2019').checked == false) ||
+           (year == 2020 && document.getElementById('chk2020').checked == false) ||
+           (year == 2021 && document.getElementById('chk2021').checked == false) ||
+           (year == 2022 && document.getElementById('chk2022').checked == false);
 }
 
 function getHourlyReport(average) {
