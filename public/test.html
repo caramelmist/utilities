@@ -3,10 +3,36 @@
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script  src="js/test.js"></script>
+        <link rel="stylesheet" href="css/app.css">
     </head>
     <body>
         this is a test
         <p id="blehbleh"></p>
+        <select name="charts" id="charts">
+            <option value="daily">Daily</option>
+            <option value="hourly">Hourly</option>
+            <option value="monthly">Monthly</option>
+        </select>
+        <input type="checkbox" id="average" name="average" value="Average">
+        <button type="button" onclick="onButtonClick()">Go</button>
+
+
+        <p>
+            <div id="list1" class="dropdown-check-list" tabindex="100">
+                <span class="anchor">Days</span>
+                <ul class="items">
+                  <li><input type="checkbox" checked="true" id="chkSunday"/>Sunday</li>
+                  <li><input type="checkbox" checked="true" id="chkMonday"/>Monday</li>
+                  <li><input type="checkbox" checked="true" id="chkTuesday"/>Tuesday</li>
+                  <li><input type="checkbox" checked="true" id="chkWednesday"/>Wednesday</li>
+                  <li><input type="checkbox" checked="true" id="chkThursday"/>Thursday</li>
+                  <li><input type="checkbox" checked="true" id="chkFriday"/>Friday</li>
+                  <li><input type="checkbox" checked="true" id="chkSaturday"/>Saturday</li>
+                </ul>
+            </div>
+        </p>
+        
+
         <canvas id="myChart" width="400" height="400"></canvas>
     </body>
 </html>

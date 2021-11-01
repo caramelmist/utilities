@@ -1,28 +1,68 @@
-function getString() {
-    return "bleh";
-}
+var myChart;
+
+var monthArray = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 var rawData = [];
+var allMinutes = [];
 var minutes = [];
 
-window.onload = function() {
-    var meh = getString();
-    var node = document.getElementById("blehbleh");
-    node.textContent += meh;
+function daysInMonth(year, month) {
+    if(month === 1){
+        return year % 4 == 0 ? 29 : 28;
+    }
+    if(month == 3 || month == 5 || month == 8 || month == 10){
+        return 30;
+    }
+    return 31;
+}
 
+window.onload = function() {
+    var checkList = document.getElementById('list1');
+    checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
+    if (checkList.classList.contains('visible'))
+        checkList.classList.remove('visible');
+    else
+        checkList.classList.add('visible');
+    };
+
+    console.log('Loading data...');
     d3.csv("data/data.csv", function(data) {
         rawData.push({Date:new Date(data.Date), KW:Number(data.KW)});
     }).then( function() { onDataLoaded();} );
 };
 
+function onButtonClick() {
+    var average = document.getElementById("average").checked;
+    var chartType = document.getElementById("charts").value;
+    
+    setChart(chartType, average);
+}
+
+function setChart(chartType, average) {
+
+    filterMinutes();
+
+    var dataset = null;
+    switch(chartType) {
+        case 'hourly': dataset = getHourlyReport(average);
+            break;
+        case 'daily': dataset = getWeeklyReport();
+            break;
+        case 'monthly': dataset = getMonthlyReport(average);
+            break;
+    }
+    
+    buildChart(dataset);
+}
+
 function onDataLoaded() {
+    console.log('Data loaded.');
     rawData.sort( function(a,b) { return a.Date.getTime() > b.Date.getTime() ? 1 : -1; });
 
     for(var i = 1; i < rawData.length; i++) {
         var difference = rawData[i].Date.getTime()-rawData[i-1].Date.getTime();
         var m = difference / 1000 / 60;
 
-        // ignore recharges
         if(m < 1) {
             console.log("How has this happened?");
             continue;
@@ -37,14 +77,65 @@ function onDataLoaded() {
 
         for(var j = 0; j < m; j++) {
             var newDate = new Date(rawData[i-1].Date.getTime() + (60000 * j));
-            minutes.push({Date:newDate, KW:averageKW});
+            allMinutes.push({Date:newDate, KW:averageKW});
         }
     }
-    
-    console.log("Complete!");
 
-    var dataset = getWeeklyReport();
-    buildChart(dataset);
+    setChart('daily', false);
+}
+
+function filterMinutes() {
+    minutes = [];
+    for(var i = 0; i < allMinutes.length; i++) {
+        var year = allMinutes[i].Date.getFullYear();
+        var month = allMinutes[i].Date.getMonth();
+        var date = allMinutes[i].Date.getDate();
+        var day = allMinutes[i].Date.getDay();
+        var hour = allMinutes[i].Date.getHours();
+
+        if(isDayFiltered(day)) {
+            continue;
+        }
+        
+        minutes.push(allMinutes[i]);
+    }
+}
+
+function isDayFiltered(day) {
+    return (day == 0 && document.getElementById('chkSunday').checked == false) ||
+           (day == 1 && document.getElementById('chkMonday').checked == false) ||
+           (day == 2 && document.getElementById('chkTuesday').checked == false) ||
+           (day == 3 && document.getElementById('chkWednesday').checked == false) ||
+           (day == 4 && document.getElementById('chkThursday').checked == false) ||
+           (day == 5 && document.getElementById('chkFriday').checked == false) ||
+           (day == 6 && document.getElementById('chkSaturday').checked == false);
+}
+
+function getHourlyReport(average) {
+    var hours = new Array(24);
+    for(var h = 0; h < hours.length; h++){
+        var label = h.toString();
+        hours[h] = {x: label, y: 0, z: 0};
+    }
+
+    for(var i = 0; i < minutes.length; i++) {
+        var year = minutes[i].Date.getFullYear();
+        var month = minutes[i].Date.getMonth();
+        var day = minutes[i].Date.getDate();
+        var hour = minutes[i].Date.getHours();
+        var kw = minutes[i].KW;
+
+        hours[hour].y += kw;
+        hours[hour].z++;
+    }       
+    
+    if(average) {
+        for(var j = 0; j < hours.length; j++) {
+            hours[j].y = (hours[j].y / hours[j].z)*60;
+        } 
+    }
+
+    return hours;
 }
 
 function getWeeklyReport() {
@@ -71,10 +162,55 @@ function getWeeklyReport() {
     return days;
 }
 
+function getMonthlyReport(average) {
+    var months = [];
+
+    for(var i = 0; i < minutes.length; i++) {
+        var year = minutes[i].Date.getFullYear();
+        var month = minutes[i].Date.getMonth();
+        var day = minutes[i].Date.getDate();
+        var kw = minutes[i].KW;
+
+        var label = monthArray[month] + "-" + year;
+        var set = getDataSet(months, label);
+        if(!set) {
+            set = {x: label, y: 0, z: 0, year: year, month: month, maxDay: 0, minDay: 32};
+            months.push(set);
+        }
+
+        set.y += kw;
+        set.z++;
+        set.maxDay = day;
+        set.minDay = day < set.minDay ? day : set.minDay;
+    }       
+    
+    if(average) {
+        for(var j = 0; j < months.length; j++) {
+            months[j].y = months[j].y / (months[j].maxDay - months[j].minDay + 1);
+        } 
+    }
+
+    return months;
+}
+
+function getDataSet(months, label) {
+    for(var i = 0; i < months.length; i++) {
+        if(months[i].x == label) {
+            return months[i];
+        }
+    }
+    return null;
+}
+
 function buildChart(set){
-    //console.log(dataset);
+    console.log('Building chart.');
+
+    if(myChart) {
+        myChart.destroy();
+    }
+
     var ctx = document.getElementById('myChart');
-    var myChart = new Chart(ctx, {
+    myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             datasets: [{
@@ -83,40 +219,4 @@ function buildChart(set){
             }]
         }
     });
-    /*
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-    */
 }
