@@ -26,6 +26,30 @@ window.onload = function() {
     }).then( function() { onDataLoaded();} );
 };
 
+function initializeDateInputs() {
+    var dateInput = this.initializeDateInput("startDate");
+    dateInput.value = dateInput.min;
+
+    dateInput = this.initializeDateInput("endDate");
+    dateInput.value = dateInput.max;
+}
+
+function initializeDateInput(id) {
+    var dateInput = document.getElementById(id);
+    var rd = rawData[rawData.length -1].Date;
+    dateInput.max = this.toDateInputFormat(rd);
+    rd = rawData[0].Date;
+    dateInput.min = this.toDateInputFormat(rd);
+    return dateInput;
+}
+
+function toDateInputFormat(dateObject) {
+    var m = dateObject.getMonth()+1;
+    var mm = m < 10 ? "0" + m : m;
+    var dd = dateObject.getDate() < 10 ? "0" + dateObject.getDate() : dateObject.getDate();
+    return dateObject.getFullYear()+"-"+mm+"-"+dd;
+}
+
 function initializeList(id) {
     var checkList = document.getElementById(id);
     checkList.getElementsByClassName('anchor')[0].onclick = function(evt) {
@@ -63,6 +87,8 @@ function setChart(chartType, average) {
 function onDataLoaded() {
     console.log('Data loaded.');
     rawData.sort( function(a,b) { return a.Date.getTime() > b.Date.getTime() ? 1 : -1; });
+
+    this.initializeDateInputs();
 
     for(var i = 1; i < rawData.length; i++) {
         var difference = rawData[i].Date.getTime()-rawData[i-1].Date.getTime();

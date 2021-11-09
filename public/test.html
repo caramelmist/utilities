@@ -6,8 +6,6 @@
         <link rel="stylesheet" href="css/app.css">
     </head>
     <body>
-        this is a test
-        <p id="blehbleh"></p>
         <select name="charts" id="charts">
             <option value="daily">Daily</option>
             <option value="hourly">Hourly</option>
@@ -16,6 +14,10 @@
         <input type="checkbox" id="average" name="average" value="Average">
         <button type="button" onclick="onButtonClick()">Go</button>
 
+        <p>
+            <input type="date" id="startDate" value="2019-01-01" min="2019-01-01" max="2021-12-31"/>
+            <input type="date" id="endDate" value="2021-11-09" min="2019-01-01" max="2021-12-31"/>
+        </p>
 
         <p>
             <div id="list1" class="dropdown-check-list" tabindex="100">
