@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script  src="js/test.js"></script>
+        <link rel="stylesheet" href="css/app.css">
+    </head>
+    <body>
+        <select name="charts" id="charts">
+            <option value="daily">Daily</option>
+            <option value="hourly">Hourly</option>
+            <option value="monthly">Monthly</option>
+        </select>
+        <input type="checkbox" id="average" name="average" value="Average">
+        <button type="button" onclick="onCompareClick()">Go</button>
+
+        <p>
+            <input type="date" id="startDate" value="2019-01-01" min="2019-01-01" max="2021-12-31"/>
+            <input type="date" id="endDate" value="2021-11-09" min="2019-01-01" max="2021-12-31"/>
+        </p>
+
+        <p>
+            <input type="date" id="secondstartDate" value="2019-01-01" min="2019-01-01" max="2021-12-31"/>
+            <input type="date" id="secondendDate" value="2021-11-09" min="2019-01-01" max="2021-12-31"/>
+        </p>
+
+        <p>
+            <div id="list1" class="dropdown-check-list" tabindex="100">
+                <span class="anchor">Days</span>
+                <ul class="items">
+                  <li><input type="checkbox" checked="true" id="chkSunday"/>Sunday</li>
+                  <li><input type="checkbox" checked="true" id="chkMonday"/>Monday</li>
+                  <li><input type="checkbox" checked="true" id="chkTuesday"/>Tuesday</li>
+                  <li><input type="checkbox" checked="true" id="chkWednesday"/>Wednesday</li>
+                  <li><input type="checkbox" checked="true" id="chkThursday"/>Thursday</li>
+                  <li><input type="checkbox" checked="true" id="chkFriday"/>Friday</li>
+                  <li><input type="checkbox" checked="true" id="chkSaturday"/>Saturday</li>
+                </ul>
+            </div>
+
+            <div id="list2" class="dropdown-check-list" tabindex="101">
+                <span class="anchor">Years</span>
+                <ul class="items">
+                  <li><input type="checkbox" checked="true" id="chk2019"/>2019</li>
+                  <li><input type="checkbox" checked="true" id="chk2020"/>2020</li>
+                  <li><input type="checkbox" checked="true" id="chk2021"/>2021</li>
+                  <li><input type="checkbox" checked="true" id="chk2022"/>2022</li>
+                </ul>
+            </div>
+        </p>
+        
+
+        <canvas id="myChart" width="400" height="400"></canvas>
+    </body>
+</html>

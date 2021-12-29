@@ -67,21 +67,44 @@ function onButtonClick() {
     setChart(chartType, average);
 }
 
+function onCompareClick() {
+    var average = document.getElementById("average").checked;
+    var chartType = document.getElementById("charts").value;
+    
+    compareChart(chartType, average);
+}
+
 function setChart(chartType, average) {
 
     filterMinutes();
 
-    var dataset = null;
-    switch(chartType) {
-        case 'hourly': dataset = getHourlyReport(average);
-            break;
-        case 'daily': dataset = getWeeklyReport();
-            break;
-        case 'monthly': dataset = getMonthlyReport(average);
-            break;
-    }
+    var dataset = this.dataSetForChart(chartType, average);
     
     buildChart(dataset);
+}
+
+function compareChart(chartType, average) {
+
+    filterMinutes();
+    var dataset = this.dataSetForChart(chartType, true);
+
+    var dateInput = document.getElementById("secondstartDate").value;
+    var sDate = new Date(dateInput);
+    dateInput = document.getElementById("secondendDate").value;
+    var eDate = new Date(dateInput);
+    this.filterMinutesWithDate(sDate, eDate);
+    var set2 = this.dataSetForChart(chartType, true);
+    
+    buildCompareChart(dataset, set2);
+}
+
+function dataSetForChart(chartType, average) {
+    switch(chartType) {
+        case 'hourly': return getHourlyReport(average);
+        case 'daily': return getWeeklyReport();
+        case 'monthly': return getMonthlyReport(average);
+    }
+    return null;
 }
 
 function onDataLoaded() {
@@ -116,13 +139,27 @@ function onDataLoaded() {
 }
 
 function filterMinutes() {
+    var dateInput = document.getElementById("startDate").value;
+    var sDate = new Date(dateInput);
+    dateInput = document.getElementById("endDate").value;
+    var eDate = new Date(dateInput);
+
+    this.filterMinutesWithDate(sDate, eDate);
+}
+
+function filterMinutesWithDate(sDate, eDate) {
     minutes = [];
     for(var i = 0; i < allMinutes.length; i++) {
+        
         var year = allMinutes[i].Date.getFullYear();
         var month = allMinutes[i].Date.getMonth();
         var date = allMinutes[i].Date.getDate();
         var day = allMinutes[i].Date.getDay();
         var hour = allMinutes[i].Date.getHours();
+        var time = allMinutes[i].Date.getTime();
+        if(time < sDate.getTime() || time >= (eDate.getTime()+(24*60*60*1000))) {
+            continue;
+        }
 
         if(isYearFiltered(year) || isDayFiltered(day)) {
             continue;
@@ -249,11 +286,35 @@ function buildChart(set){
 
     var ctx = document.getElementById('myChart');
     myChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
             datasets: [{
                 label: 'KW',
                 data: set
+            }]
+        }
+    });
+}
+
+function buildCompareChart(set, set2){
+    console.log('Building chart.');
+
+    if(myChart) {
+        myChart.destroy();
+    }
+
+    var ctx = document.getElementById('myChart');
+    myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'KW',
+                data: set,
+                borderColor: 'rgb(75, 192, 192)'
+            },{
+                label: 'KW',
+                data: set2,
+                borderColor: 'rgb(120, 99, 00)'
             }]
         }
     });
