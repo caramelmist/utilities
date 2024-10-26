@@ -32,10 +32,19 @@ function initializeDateInputs() {
 
     dateInput = this.initializeDateInput("endDate");
     dateInput.value = dateInput.max;
+
+    dateInput = this.initializeDateInput("secondstartDate");
+    dateInput.value = dateInput.min;
+
+    dateInput = this.initializeDateInput("secondendDate");
+    dateInput.value = dateInput.max;
 }
 
 function initializeDateInput(id) {
     var dateInput = document.getElementById(id);
+    if(!dateInput){
+        return;
+    }
     var rd = rawData[rawData.length -1].Date;
     dateInput.max = this.toDateInputFormat(rd);
     rd = rawData[0].Date;
