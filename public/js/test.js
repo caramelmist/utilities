@@ -34,7 +34,7 @@ function initializeDateInputs() {
     dateInput.value = dateInput.max;
 
     dateInput = this.initializeDateInput("secondstartDate");
-    if(dateinput) {
+    if(dateInput) {
         dateInput.value = dateInput.min;
     
         dateInput = this.initializeDateInput("secondendDate");
