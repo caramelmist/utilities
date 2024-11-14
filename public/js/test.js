@@ -34,10 +34,12 @@ function initializeDateInputs() {
     dateInput.value = dateInput.max;
 
     dateInput = this.initializeDateInput("secondstartDate");
-    dateInput.value = dateInput.min;
-
-    dateInput = this.initializeDateInput("secondendDate");
-    dateInput.value = dateInput.max;
+    if(dateinput) {
+        dateInput.value = dateInput.min;
+    
+        dateInput = this.initializeDateInput("secondendDate");
+        dateInput.value = dateInput.max;
+    }
 }
 
 function initializeDateInput(id) {
